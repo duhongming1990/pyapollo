@@ -1,0 +1,99 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyapollo-config"
+version = "0.2.0"
+description = "Apollo (Ctrip) config client with properties/YAML/JSON, long polling, async support and service discovery"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [
+  { name = "Apollo Python Client contributors" },
+]
+keywords = [
+  "apollo",
+  "config",
+  "configuration",
+  "ctrip",
+  "properties",
+  "yaml",
+  "hot-reload",
+  "long-polling",
+  "meta-server",
+  "asyncio",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Framework :: AsyncIO",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Typing :: Typed",
+]
+dependencies = [
+  "requests>=2.28",
+  "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+async = [
+    "httpx>=0.27",
+]
+demo = [
+  "fastapi>=0.110",
+  "uvicorn>=0.29",
+]
+test = [
+  "pytest>=8.0",
+  "httpx>=0.27",
+  "fastapi>=0.110",
+  "uvicorn>=0.29",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0",
+  "httpx>=0.27",
+  "fastapi>=0.110",
+  "uvicorn>=0.29",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/apollo_client"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/apollo_client",
+  "tests",
+  "demo",
+  "mock_apollo",
+  "README.md",
+  "COMPARISON.md",
+  "docs",
+  "LICENSE",
+  "CHANGELOG.md",
+  "pyproject.toml",
+]
+exclude = [
+  ".gitignore",
+  ".venv",
+  "dist",
+  "uv.lock",
+  "**/__pycache__",
+  "**/*.pyc",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+addopts = "-ra"

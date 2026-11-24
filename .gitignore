@@ -1,0 +1,10 @@
+.idea
+.venv
+git-tools.sh
+.pre-commit-config.yaml
+dist/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.uv-cache/
+.chrome-profile/

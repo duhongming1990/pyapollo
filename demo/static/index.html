@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Apollo Config Console</title>
+  <style>
+    :root {
+      --bg: #080c17;
+      --panel: #10182b;
+      --panel-2: #0c1324;
+      --line: #22304d;
+      --text: #e6edff;
+      --muted: #8ea0c4;
+      --accent: #6d9bff;
+      --green: #4ade80;
+      --amber: #fbbf24;
+      --red: #fb7185;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(900px 500px at 12% -10%, rgba(109, 155, 255, .18), transparent 60%),
+        radial-gradient(700px 420px at 100% 0%, rgba(74, 222, 128, .10), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 24px clamp(18px, 4vw, 48px) 16px;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      width: 42px; height: 42px; border-radius: 12px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, #6d9bff, #8b5cf6 55%, #22d3ee);
+      color: #061022; font-weight: 800; font-size: 20px;
+      box-shadow: 0 10px 30px rgba(109, 155, 255, .28);
+    }
+    h1 { margin: 0; font-size: 19px; letter-spacing: .2px; }
+    .subtitle { margin: 2px 0 0; color: var(--muted); font-size: 12.5px; }
+    .meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+    .target { color: var(--muted); font-family: var(--mono); font-size: 12px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 6px 11px; border-radius: 999px;
+      border: 1px solid var(--line); background: rgba(16, 24, 43, .8);
+      color: var(--muted); font-size: 12px; font-weight: 600;
+    }
+    .pill::before {
+      content: ""; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--amber); box-shadow: 0 0 12px currentColor;
+    }
+    .pill.live { color: var(--green); border-color: rgba(74, 222, 128, .3); }
+    .pill.live::before { background: var(--green); }
+    .pill.down { color: var(--red); border-color: rgba(251, 113, 133, .3); }
+    .pill.down::before { background: var(--red); }
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(300px, .9fr);
+      gap: 18px;
+      padding: 0 clamp(18px, 4vw, 48px) 28px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { main { grid-template-columns: 1fr; } }
+    .panel {
+      background: linear-gradient(180deg, rgba(16, 24, 43, .96), rgba(12, 19, 36, .96));
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 18px 60px rgba(0, 0, 0, .28);
+      overflow: hidden;
+    }
+    .panel-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--line);
+    }
+    .panel-head h2 { margin: 0; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+    .muted { color: var(--muted); font-family: var(--mono); font-size: 12px; }
+    button {
+      appearance: none; cursor: pointer;
+      border: 1px solid rgba(109, 155, 255, .35);
+      background: rgba(109, 155, 255, .12); color: #cfe0ff;
+      border-radius: 9px; padding: 7px 12px; font-size: 12px; font-weight: 600;
+      transition: .15s ease;
+    }
+    button:hover { background: rgba(109, 155, 255, .22); border-color: rgba(109, 155, 255, .6); }
+    button:active { transform: translateY(1px); }
+    .cards { display: grid; gap: 14px; padding: 16px; }
+    .card {
+      border: 1px solid var(--line); border-radius: 13px;
+      background: var(--panel-2); overflow: hidden;
+    }
+    .card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--line);
+    }
+    .ns { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .ns code { font-family: var(--mono); font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .badge {
+      flex: none; padding: 2px 7px; border-radius: 6px;
+      font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: .04em;
+      color: #cfe0ff; background: rgba(109, 155, 255, .15); border: 1px solid rgba(109, 155, 255, .3);
+      text-transform: uppercase;
+    }
+    .badge.cache { color: var(--amber); background: rgba(251, 191, 36, .1); border-color: rgba(251, 191, 36, .3); }
+    .badge.remote { color: var(--green); background: rgba(74, 222, 128, .1); border-color: rgba(74, 222, 128, .3); }
+    .release { color: var(--muted); font-family: var(--mono); font-size: 11px; }
+    pre {
+      margin: 0; padding: 14px; overflow: auto; max-height: 330px;
+      font-family: var(--mono); font-size: 12.5px; line-height: 1.6;
+      color: #cdd9f6; background: transparent;
+    }
+    details { border-top: 1px solid var(--line); }
+    details summary {
+      cursor: pointer; padding: 9px 14px; color: var(--muted); font-size: 11.5px;
+      user-select: none; list-style: none;
+    }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::before { content: "▸ "; color: var(--accent); }
+    details[open] summary::before { content: "▾ "; }
+    details pre { max-height: 240px; border-top: 1px solid var(--line); }
+    .card-foot {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 8px 14px; border-top: 1px solid var(--line);
+      color: var(--muted); font-size: 11px; font-family: var(--mono);
+    }
+    .event-list { padding: 12px; display: grid; gap: 10px; max-height: 70vh; overflow: auto; }
+    .event {
+      border: 1px solid var(--line); border-left: 3px solid var(--accent);
+      background: var(--panel-2); border-radius: 10px; padding: 10px 12px;
+      animation: slide-in .25s ease;
+    }
+    @keyframes slide-in { from { opacity: 0; transform: translateY(-4px); } }
+    .event-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .event-ns { font-family: var(--mono); font-size: 12px; color: #cfe0ff; font-weight: 700; }
+    .event-time { color: var(--muted); font-size: 10.5px; font-family: var(--mono); }
+    .event ul { margin: 8px 0 0; padding: 0; list-style: none; display: grid; gap: 5px; }
+    .event li { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; font-size: 11.5px; }
+    .event code { font-family: var(--mono); color: #dbe6ff; }
+    .diff { color: var(--muted); font-family: var(--mono); word-break: break-all; }
+    .kind {
+      font-size: 9.5px; font-weight: 800; text-transform: uppercase;
+      padding: 1px 5px; border-radius: 4px; background: rgba(109, 155, 255, .14); color: var(--accent);
+    }
+    .kind.added { color: var(--green); background: rgba(74, 222, 128, .12); }
+    .kind.removed { color: var(--red); background: rgba(251, 113, 133, .12); }
+    .empty { color: var(--muted); font-size: 12px; text-align: center; padding: 28px 12px; margin: 0; }
+    footer {
+      padding: 0 clamp(18px, 4vw, 48px) 30px;
+      color: var(--muted); font-size: 11.5px;
+    }
+    footer code {
+      font-family: var(--mono); color: #b9c9ee;
+      background: rgba(109, 155, 255, .08); border: 1px solid var(--line);
+      padding: 3px 7px; border-radius: 6px; word-break: break-all;
+    }
+    .toast {
+      position: fixed; right: 22px; bottom: 22px; z-index: 20;
+      padding: 10px 14px; border-radius: 10px;
+      border: 1px solid rgba(74, 222, 128, .35);
+      background: rgba(12, 30, 24, .95); color: #b9f6ce;
+      font-size: 12px; opacity: 0; transform: translateY(8px);
+      transition: .22s ease; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { border-color: rgba(251, 113, 133, .4); background: rgba(35, 12, 18, .96); color: #ffc2ca; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">A</div>
+      <div>
+        <h1>Apollo Config Console</h1>
+        <p class="subtitle">YAML / Properties · pull + long-polling hot update</p>
+      </div>
+    </div>
+    <div class="meta">
+      <span class="target" id="target">loading…</span>
+      <span class="pill" id="status">connecting</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Namespaces</h2>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="muted" id="loaded-at"></span>
+          <button id="refresh" type="button">Refresh now</button>
+        </div>
+      </div>
+      <div class="cards" id="cards">
+        <p class="empty">Loading configuration…</p>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="panel-head">
+        <h2>Live updates</h2>
+        <span class="muted"><span id="event-count">0</span> events</span>
+      </div>
+      <div class="event-list" id="events">
+        <p class="empty" id="events-empty">Waiting for Apollo changes…</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    Publish a new release against the mock Apollo:
+    <code>curl -X PUT http://127.0.0.1:18080/admin/configs/demo-app/default/application -H 'Content-Type: application/json' -d '{"content":"app.name=Updated\napp.limits.max=200"}'</code>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const state = { events: 0, toastTimer: null };
+    const $ = (id) => document.getElementById(id);
+
+    const esc = (value) => String(value).replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[char]));
+
+    const fmtValue = (value) => {
+      if (value === null || value === undefined) return "null";
+      return typeof value === "object" ? JSON.stringify(value) : String(value);
+    };
+
+    function setStatus(mode) {
+      const pill = $("status");
+      pill.className = "pill " + (mode === "live" ? "live" : mode === "down" ? "down" : "");
+      pill.textContent = mode === "live" ? "live" : mode === "down" ? "disconnected" : "connecting";
+    }
+
+    function toast(message, isError = false) {
+      const element = $("toast");
+      element.textContent = message;
+      element.className = "toast show" + (isError ? " error" : "");
+      clearTimeout(state.toastTimer);
+      state.toastTimer = setTimeout(() => { element.className = "toast"; }, 2600);
+    }
+
+    function cardTemplate(config) {
+      const data = JSON.stringify(config.data ?? {}, null, 2);
+      const release = config.releaseKey ? String(config.releaseKey).slice(0, 18) : "—";
+      const source = config.source || "unknown";
+      const sourceClass = source === "cache" ? "cache" : "remote";
+      const loaded = config.loadedAt ? new Date(config.loadedAt * 1000).toLocaleTimeString() : "—";
+      return `
+        <article class="card">
+          <div class="card-head">
+            <div class="ns">
+              <code>${esc(config.namespace)}</code>
+              <span class="badge">${esc(config.format)}</span>
+              <span class="badge ${sourceClass}">${esc(source)}</span>
+            </div>
+            <span class="release" title="releaseKey">${esc(release)}</span>
+          </div>
+          <pre>${esc(data)}</pre>
+          <details>
+            <summary>Raw Apollo content</summary>
+            <pre>${esc(config.raw || "")}</pre>
+          </details>
+          <div class="card-foot">
+            <span>loaded ${esc(loaded)}</span>
+            <span>notification #${esc(config.notificationId ?? "-")}</span>
+          </div>
+        </article>`;
+    }
+
+    function renderConfigs(payload) {
+      $("target").textContent = `${payload.appId} / ${payload.cluster}`;
+      const entries = Object.values(payload.namespaces || {})
+        .sort((a, b) => String(a.namespace).localeCompare(String(b.namespace)));
+      $("cards").innerHTML = entries.length
+        ? entries.map(cardTemplate).join("")
+        : '<p class="empty">No namespaces loaded. Is the mock Apollo running?</p>';
+      $("loaded-at").textContent = new Date().toLocaleTimeString();
+    }
+
+    async function loadConfigs() {
+      try {
+        const response = await fetch("/config", { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        renderConfigs(await response.json());
+      } catch (error) {
+        toast(`Could not load config: ${error.message}`, true);
+      }
+    }
+
+    function renderEvent(event) {
+      const list = $("events");
+      $("events-empty")?.remove();
+      state.events += 1;
+      $("event-count").textContent = String(state.events);
+
+      const changes = Object.values(event.changes || {});
+      const items = changes.map((change) => {
+        const before = change.kind === "added" ? "" : fmtValue(change.old);
+        const after = change.kind === "removed" ? "" : fmtValue(change.new);
+        const arrow = change.kind === "updated" ? " → " : " ";
+        return `<li>
+          <span class="kind ${esc(change.kind)}">${esc(change.kind)}</span>
+          <code>${esc(change.key)}</code>
+          <span class="diff">${esc(before)}${arrow}${esc(after)}</span>
+        </li>`;
+      }).join("");
+
+      const element = document.createElement("div");
+      element.className = "event";
+      element.innerHTML = `
+        <div class="event-top">
+          <span class="event-ns">${esc(event.namespace)}</span>
+          <span class="event-time">${new Date(event.at * 1000).toLocaleTimeString()}</span>
+        </div>
+        <ul>${items || '<li class="diff">release updated</li>'}</ul>`;
+      list.prepend(element);
+      while (list.querySelectorAll(".event").length > 30) {
+        list.querySelectorAll(".event")[list.querySelectorAll(".event").length - 1].remove();
+      }
+    }
+
+    function connectEvents() {
+      const source = new EventSource("/events");
+      source.addEventListener("ready", () => setStatus("live"));
+      source.addEventListener("config-change", (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          renderEvent(payload);
+          loadConfigs();
+        } catch (error) {
+          console.error("bad SSE payload", error);
+        }
+      });
+      source.onopen = () => setStatus("live");
+      source.onerror = () => setStatus("down");
+    }
+
+    $("refresh").addEventListener("click", async () => {
+      $("refresh").disabled = true;
+      try {
+        const response = await fetch("/config/refresh", { method: "POST" });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.detail || `HTTP ${response.status}`);
+        const changed = Object.entries(payload.events || {})
+          .filter(([, value]) => value)
+          .map(([name]) => name);
+        toast(changed.length ? `Updated: ${changed.join(", ")}` : "No changes on the server");
+        await loadConfigs();
+      } catch (error) {
+        toast(`Refresh failed: ${error.message}`, true);
+      } finally {
+        $("refresh").disabled = false;
+      }
+    });
+
+    loadConfigs();
+    connectEvents();
+    setInterval(loadConfigs, 30000);
+  </script>
+</body>
+</html>
