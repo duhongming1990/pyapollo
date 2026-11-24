@@ -9,9 +9,15 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    name: Test and build
+  publish:
+    name: Test, build and publish
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pyapollo-config
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -52,29 +58,6 @@ jobs:
 
       - name: Build wheel and sdist
         run: python -m build
-
-      - name: Upload distributions
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-package-distributions
-          path: dist/
-          if-no-files-found: error
-
-  publish:
-    name: Publish to PyPI
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/pyapollo-config
-    permissions:
-      id-token: write
-    steps:
-      - name: Download distributions
-        uses: actions/download-artifact@v4
-        with:
-          name: python-package-distributions
-          path: dist/
 
       - name: Publish distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
