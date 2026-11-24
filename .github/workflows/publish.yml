@@ -80,7 +80,4 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
-          # Trusted publishing (OIDC) needs no secret. If the PyPI project is
-          # not configured for trusted publishing, create a PYPI_API_TOKEN
-          # repository secret and pass it instead:
-          # password: ${{ secrets.PYPI_API_TOKEN }}
+          password: ${{ secrets.PYPI_API_TOKEN }}

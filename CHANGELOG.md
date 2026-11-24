@@ -34,7 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   the asyncio client.
 - GitHub Actions workflow (`.github/workflows/publish.yml`) that runs tests,
   verifies the tag against the package version, builds wheel/sdist and
-  publishes to PyPI through Trusted Publishing when a `v*` tag is pushed.
+  publishes to PyPI with the `PYPI_API_TOKEN` secret when a `v*` tag is
+  pushed (Trusted Publishing is also supported).
 
 ### Changed
 

@@ -436,10 +436,9 @@ curl -N http://127.0.0.1:8000/events
 
 仓库包含 [.github/workflows/publish.yml](.github/workflows/publish.yml)：推送 `v*` tag 时会自动运行测试、校验 tag 与版本号、构建 wheel / sdist 并发布到 PyPI。
 
-1. 在 PyPI 项目 `pyapollo-config` 的 Publishing 设置中添加 **Trusted Publisher**：
-   - Owner / repository：仓库所有者与仓库名
-   - Workflow name：`publish.yml`
-   - Environment name：`pypi`
+1. 在 PyPI 创建 API token，并在 GitHub 仓库 **Settings → Secrets and variables → Actions** 中添加名为 `PYPI_API_TOKEN` 的 secret。
+   - 首次发布（项目尚不存在）可使用账号级 token；项目创建后可改为项目级 token。
+   - 也可以改用 **Trusted Publisher**（OIDC）：删除 workflow 中的 `password`，在 PyPI 配置 `publish.yml` + 环境 `pypi`，并保留 `id-token: write`。
 2. 更新版本号（见下文），提交并推送。
 3. 创建并推送 tag（tag 必须为 `v` + 版本号）：
 
@@ -452,10 +451,10 @@ git push origin v0.2.0
 
 - 在 Python 3.12 上安装依赖并运行全部 68 个测试；
 - 校验 tag 与 `pyproject.toml` 的 `[project].version` 一致，不一致直接失败；
-- 构建 `dist/`，并使用 `pypa/gh-action-pypi-publish` 发布到 PyPI；
-- 通过 OIDC Trusted Publishing 完成认证，无需在仓库保存 PyPI token。
+- 构建 `dist/`，并使用 `pypa/gh-action-pypi-publish` 以 `PYPI_API_TOKEN` 发布到 PyPI；
+- 支持改用 OIDC Trusted Publishing：删除 `password` 并配置 PyPI 的 Trusted Publisher 即可，无需保存 token。
 
-> 如果暂时不使用 Trusted Publishing，可以在仓库添加 `PYPI_API_TOKEN` secret，并在 workflow 中启用已注释的 `password` 配置。
+> 如果发布失败，请先确认 secret 名称是否为 `PYPI_API_TOKEN`、token 是否已过期，以及 PyPI 上是否已存在同版本文件。
 
 ### 手动构建（本地检查）
 
