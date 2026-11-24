@@ -2,13 +2,13 @@
 
 对比时间：2026-11-24 · 参考图 1 的分组能力矩阵形式 · 基于各仓库默认实现
 
-本文对比 Apollo 生态中常见的四个 Python 客户端与本次新增的 `pyapollo-config`：
+本文对比 Apollo 生态中常见的四个 Python 客户端与本次新增的 `pyapollo-config-client`：
 
 - [filamoon/pyapollo](https://github.com/filamoon/pyapollo)
 - [BruceWW/pyapollo](https://github.com/BruceWW/pyapollo)
 - [xhrg-product/apollo-client-python](https://github.com/xhrg-product/apollo-client-python)
 - [OuterCloud/pyapollo](https://github.com/OuterCloud/pyapollo)
-- **pyapollo-config（本次新增）**
+- **pyapollo-config-client（本次新增）**
 
 > 只比较客户端能力，不评价 Apollo 服务端或部署方式。
 >
@@ -22,11 +22,11 @@
 | [BruceWW/pyapollo](https://github.com/BruceWW/pyapollo) | `apollo-client` | 2.1.2 | 2020-10 | Apache-2.0 |
 | [xhrg-product/apollo-client-python](https://github.com/xhrg-product/apollo-client-python) | `apollo-client-python` | 1.0.1 | 2025-06 | MIT⁷ |
 | [OuterCloud/pyapollo](https://github.com/OuterCloud/pyapollo) | `pyapollo-zenkilan` | 0.2.0 | 2025-12 | MIT |
-| **pyapollo-config（本次）** | `pyapollo-config` | 0.2.0 | 2026-11 | Apache-2.0 |
+| **pyapollo-config-client（本次）** | `pyapollo-config-client` | 0.2.0 | 2026-11 | Apache-2.0 |
 
 ## 配置格式与读取
 
-| 能力 | filamoon | BruceWW | xhrg | OuterCloud | **pyapollo-config** |
+| 能力 | filamoon | BruceWW | xhrg | OuterCloud | **pyapollo-config-client** |
 | --- | :---: | :---: | :---: | :---: | :---: |
 | Properties 命名空间 | ✅ | ✅ | ✅ | ✅ | ✅ |
 | YAML 命名空间 | ❌ | ❌ | ❌ | ❌ | **✅** |
@@ -38,7 +38,7 @@
 
 ## 更新机制
 
-| 能力 | filamoon | BruceWW | xhrg | OuterCloud | **pyapollo-config** |
+| 能力 | filamoon | BruceWW | xhrg | OuterCloud | **pyapollo-config-client** |
 | --- | :---: | :---: | :---: | :---: | :---: |
 | 首次 / 主动 Pull | ✅ | ✅ | ✅ | ✅ | ✅ |
 | 长轮询 `/notifications/v2` | ✅ | ❌ | ✅ | ❌ | **✅** |
@@ -55,11 +55,11 @@
 | BruceWW | 定时全量刷新 | 300s |
 | xhrg | 长轮询 + 循环 | 长轮询 75s，循环间隔 2s |
 | OuterCloud | 定时全量刷新 | 30s |
-| **pyapollo-config** | 长轮询（默认）/ 定时轮询 | 长轮询 60s；轮询 60s；心跳 600s；Meta 刷新 300s |
+| **pyapollo-config-client** | 长轮询（默认）/ 定时轮询 | 长轮询 60s；轮询 60s；心跳 600s；Meta 刷新 300s |
 
 ## 可靠性与安全
 
-| 能力 | filamoon | BruceWW | xhrg | OuterCloud | **pyapollo-config** |
+| 能力 | filamoon | BruceWW | xhrg | OuterCloud | **pyapollo-config-client** |
 | --- | :---: | :---: | :---: | :---: | :---: |
 | 内存缓存 | ✅ | ✅ | ✅ | ✅ | ✅ |
 | 磁盘缓存 | ❌ | ✅ | ✅ | ✅ | ✅ |
@@ -73,7 +73,7 @@
 
 ## 工程化
 
-| 能力 | filamoon | BruceWW | xhrg | OuterCloud | **pyapollo-config** |
+| 能力 | filamoon | BruceWW | xhrg | OuterCloud | **pyapollo-config-client** |
 | --- | :---: | :---: | :---: | :---: | :---: |
 | 线程安全设计 | ❌ | ❌ | ❌ | ✅ | **✅** |
 | 原生异步客户端 | ❌ | ❌ | ❌ | ✅ | **✅¹⁰** |
@@ -102,11 +102,11 @@
 
 ⁹ “现代打包”指包含 `pyproject.toml` 且可构建 wheel / sdist；仅有 `setup.py` 的记为部分支持。
 
-¹⁰ `pyapollo-config` 提供原生 asyncio 客户端 `AsyncApolloClient`，位于可选依赖组 `[async]`（httpx）；核心包仍只依赖 `requests` 与 `PyYAML`。同步客户端仍是默认入口。
+¹⁰ `pyapollo-config-client` 提供原生 asyncio 客户端 `AsyncApolloClient`，位于可选依赖组 `[async]`（httpx）；核心包仍只依赖 `requests` 与 `PyYAML`。同步客户端仍是默认入口。
 
-¹¹ `pyapollo-config` 的 Namespace 自动发现同样使用旧版 `/apps/{app}/clusters/{cluster}/namespaces` 接口；该接口不可用时自动降级为显式 namespace 列表，不阻塞启动。
+¹¹ `pyapollo-config-client` 的 Namespace 自动发现同样使用旧版 `/apps/{app}/clusters/{cluster}/namespaces` 接口；该接口不可用时自动降级为显式 namespace 列表，不阻塞启动。
 
-¹² `pyapollo-config` 通过 `watch_mode="long_poll"`（默认）或 `"poll"` 选择刷新机制；定时轮询间隔由 `poll_interval` 控制，运行中可切换。
+¹² `pyapollo-config-client` 通过 `watch_mode="long_poll"`（默认）或 `"poll"` 选择刷新机制；定时轮询间隔由 `poll_interval` 控制，运行中可切换。
 
 ¹³ Meta Server 解析 `GET {meta}/services/config`，兼容字符串列表、`{"configServers": [...]}` 与 `{"homepageUrl": ...}` 三种响应；解析失败时保留当前 Config Service 地址。
 
@@ -120,11 +120,11 @@
 | 需要 properties、namespace 自动发现、文件缓存，能接受 300s 延迟 | BruceWW，但注意 Python 3.13 的 `telnetlib` 问题 |
 | 需要 properties、长轮询、secret、回调、心跳 | xhrg，但注意无 LICENSE 文件、无过滤/事件对象 |
 | 需要 Meta Server 发现、多节点、JSON 值解析 | OuterCloud |
-| 需要 YAML / Properties、双模热更新、服务发现、心跳、结构化 diff、同步 + 异步 | **pyapollo-config** |
+| 需要 YAML / Properties、双模热更新、服务发现、心跳、结构化 diff、同步 + 异步 | **pyapollo-config-client** |
 
 ### 本次客户端的取舍
 
-`pyapollo-config` 0.2.0 已覆盖此前矩阵中所有标记为“不支持”的能力：
+`pyapollo-config-client` 0.2.0 已覆盖此前矩阵中所有标记为“不支持”的能力：
 
 - YAML / JSON namespace 与 Properties 原生字符串语义；
 - 长轮询与定时轮询两种刷新机制，监听器可按 namespace、key 过滤，事件包含 added / updated / removed；
@@ -137,7 +137,7 @@
 仍有前提或需要说明的地方：
 
 - Namespace 自动发现依赖 Apollo 的旧版发现接口，新版本未开放时只能使用显式列表；
-- 异步客户端需要安装可选依赖 `pyapollo-config[async]`（httpx），同步客户端不引入额外依赖；
+- 异步客户端需要安装可选依赖 `pyapollo-config-client[async]`（httpx），同步客户端不引入额外依赖；
 - 心跳默认每 600s 一次全量拉取，可能带来额外请求；对请求量敏感的场景可调大间隔或关闭；
 - Meta Server 仅实现 `/services/config` 解析，不包含 Eureka 注册中心协议本身。
 

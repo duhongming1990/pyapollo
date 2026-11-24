@@ -3,7 +3,7 @@ requires = ["hatchling>=1.27"]
 build-backend = "hatchling.build"
 
 [project]
-name = "pyapollo-config"
+name = "pyapollo-config-client"
 version = "0.2.0"
 description = "Apollo (Ctrip) config client with properties/YAML/JSON, long polling, async support and service discovery"
 readme = "README.md"

@@ -8,7 +8,7 @@ loop.
 
 ``httpx`` is an optional dependency::
 
-    pip install "pyapollo-config[async]"
+    pip install "pyapollo-config-client[async]"
 
 Configuration reads are plain in-memory lookups and stay synchronous (they
 never touch the network); only operations that may perform I/O are ``async``.
@@ -34,7 +34,7 @@ try:  # pragma: no cover - exercised only when the extra is missing
 except ImportError as exc:  # pragma: no cover
     raise ImportError(
         "AsyncApolloClient requires httpx. Install it with "
-        '`pip install "pyapollo-config[async]"`.'
+        '`pip install "pyapollo-config-client[async]"`.'
     ) from exc
 
 from ._version import __version__

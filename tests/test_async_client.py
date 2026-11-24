@@ -346,4 +346,4 @@ def test_async_client_requires_httpx() -> None:
         check=False,
     )
     assert result.returncode != 0
-    assert "pyapollo-config[async]" in result.stderr
+    assert "pyapollo-config-client[async]" in result.stderr

@@ -1,4 +1,4 @@
-# pyapollo-config
+# pyapollo-config-client
 
 一个独立的、可发布的 Python Apollo（携程配置中心）客户端：
 
@@ -12,7 +12,7 @@
 - 支持磁盘缓存容灾、Apollo `secret` 签名、多 Config Service 故障转移；
 - 附带 Mock Apollo、FastAPI Demo 与完整测试。
 
-> 发布名：`pyapollo-config`，导入名：`apollo_client`。
+> 发布名：`pyapollo-config-client`，导入名：`apollo_client`。
 > 参考了 [filamoon/pyapollo](https://github.com/filamoon/pyapollo)、
 > [BruceWW/pyapollo](https://github.com/BruceWW/pyapollo)、
 > [xhrg-product/apollo-client-python](https://github.com/xhrg-product/apollo-client-python)、
@@ -22,19 +22,19 @@
 ## 安装
 
 ```bash
-pip install pyapollo-config
+pip install pyapollo-config-client
 ```
 
 需要原生异步客户端（httpx）时：
 
 ```bash
-pip install "pyapollo-config[async]"
+pip install "pyapollo-config-client[async]"
 ```
 
 需要 Demo 依赖（FastAPI / Uvicorn）时：
 
 ```bash
-pip install "pyapollo-config[demo]"
+pip install "pyapollo-config-client[demo]"
 ```
 
 要求 Python >= 3.10，核心依赖只有 `requests` 与 `PyYAML`。
@@ -222,7 +222,7 @@ with ApolloClient(
 ## 原生异步客户端
 
 ```bash
-pip install "pyapollo-config[async]"
+pip install "pyapollo-config-client[async]"
 ```
 
 ```python
@@ -328,7 +328,7 @@ def read_config(key: str):
 ## 包结构
 
 ```text
-pyapollo-config/
+pyapollo-config-client/
 ├── pyproject.toml
 ├── README.md
 ├── COMPARISON.md
@@ -471,7 +471,7 @@ uvx twine check dist/*
 
 ```bash
 python -m venv /tmp/apollo-wheel-test
-/tmp/apollo-wheel-test/bin/pip install dist/pyapollo_config-0.2.0-py3-none-any.whl
+/tmp/apollo-wheel-test/bin/pip install dist/pyapollo_config_client-0.2.0-py3-none-any.whl
 /tmp/apollo-wheel-test/bin/python -c "from apollo_client import ApolloClient, __version__; print(__version__)"
 ```
 
@@ -509,7 +509,7 @@ GET {metaServer}/services/config?appId=...&ip=...      # Meta Server
 简要结论：
 
 - 只需要最简 properties 拉取：filamoon / BruceWW，但两者都已多年未更新；
-- 需要单进程内快速接入、YAML / JSON、秒级热更新、服务发现、异步与完整可观测：本包 `pyapollo-config`；
+- 需要单进程内快速接入、YAML / JSON、秒级热更新、服务发现、异步与完整可观测：本包 `pyapollo-config-client`；
 - 本包在 0.2.0 起覆盖了此前缺失的 Namespace 自动发现、定时轮询、Meta Server、心跳、运行时参数更新和原生异步，不再需要组合多个客户端。
 
 ## 与参考实现的差异

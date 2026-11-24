@@ -15,7 +15,7 @@ Example
 8080
 
 For asyncio applications import ``AsyncApolloClient`` (requires the ``async``
-extra: ``pip install "pyapollo-config[async]"``)::
+extra: ``pip install "pyapollo-config-client[async]"``)::
 
     from apollo_client import AsyncApolloClient
 
